@@ -1,39 +1,39 @@
 # imports
-import requests
-import os
+import tkinter as tk
+from classes.Downloader import Downloader
 
-# url to download from
-url = ""
+# Create a window
+window = tk.Tk()
 
-# file name to save the downloaded file under
-downloaded_filename = ""
+# Set the window title
+window.title("Internet Download Manager")
 
-# path to save downloaded file
-save_path = "downloads/" + downloaded_filename
+# Set the window size
+window.geometry("400x300")
 
-def download_file(url, save_path):
-    # set a default file size of 0
-    file_size = 0
 
-    # check if the file already exists
-    if os.path.exists(save_path):
-        file_size = os.path.getsize(save_path)
 
-    # get byte range to resume download from
-    headers = {'Range': f'bytes={file_size}-'}
+# url label and input field
+url_entry_label = tk.Label(window, text="URL: ")
+url_entry_label.pack()
+url_entry = tk.Entry(window)
+url_entry.pack()
 
-    # send http request
-    response = requests.get(url, headers=headers, stream=True)
+# file name label and input field
+filename_label = tk.Label(window, text="Save file as: ")
+filename_label.pack()
+filename_entry = tk.Entry(window, textvariable="Save file as")
+filename_entry.pack()
 
-    # raise an exception in case of an error
-    response.raise_for_status()
+# download function
+def download():
+    downloader = Downloader(url_entry.get(), filename_entry.get())
+    downloader.download_file()
 
-    # open the file in append mode
-    with open(save_path, 'wb') as file:
-        # write downloaded data to the download file in chunks
-        for chunk in response.iter_content(chunk_size=8192):
-            file.write(chunk)
+# download button
+download_btn = tk.Button(window, text="Download", command=download)
+download_btn.pack()
 
-    print("File downloaded successfully.")
 
-download_file(url, save_path)
+# Run the application
+window.mainloop()
